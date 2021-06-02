@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>First Page</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1"
+      crossorigin="anonymous"
+    />
+
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="row justify-content-md-center">
+        <div class="col col-lg-5">
+          <div class="alert alert-light" role="alert">
+            First page
+          </div>
+
+          <br />
+
+          <form
+            class="paypal-payment-form"
+            action="/second-page.html"
+            method="get"
+          >
+            <div
+              class="form-check d-flex justify-content-start align-items-center"
+            >
+              <input
+                class="form-check-input"
+                type="radio"
+                name="payment-option"
+                value="paypal"
+                id="paypal-radio"
+                checked
+              />
+              <label class="form-check-label px-2" for="paypal-radio">
+                <span id="paypal-mark"></span>
+              </label>
+            </div>
+
+            <div
+              class="form-check d-flex justify-content-start align-items-center"
+            >
+              <input
+                class="form-check-input"
+                type="radio"
+                id="ideal-radio"
+                value="ideal"
+                name="payment-option"
+                type="radio"
+              />
+              <label class="form-check-label px-2" for="ideal-radio">
+                <span id="ideal-mark"></span>
+              </label>
+            </div>
+
+            <div class="pt-3" id="ideal-container"></div>
+
+            <div
+              class="form-check d-flex justify-content-start align-items-center"
+            >
+              <input
+                class="form-check-input mr-3 d-flex"
+                type="radio"
+                id="sofort-radio"
+                value="sofort"
+                name="payment-option"
+                type="radio"
+              />
+              <label class="form-check-label px-2" for="sofort-radio">
+                <span id="sofort-mark"></span>
+              </label>
+            </div>
+
+            <div class="pt-3" id="sofort-container"></div>
+
+            <button
+              id="submit-btn"
+              type="submit"
+              class="btn btn-light float-end"
+            >
+              Next
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://www.paypal.com/sdk/js?client-id=AfPbdUbV4LJdK0-0B0QPeUyHnzGgVhIwZfBO3wYRoazaSYRJAIKwwHnfI0EbekJB42FJuVi-3-vgsQvi&components=buttons,fields,marks,funding-eligibility&enable-funding=ideal,sofort,giropay,p24,trustly,bancontact,mybank,eps&currency=EUR"></script>
+    <script
+      src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"
+      async
+    ></script>
+
+    <script>
+      /* -----
+      PAYPAL
+      ------ */
+      paypal
+        .Marks({
+          fundingSource: paypal.FUNDING.PAYPAL,
+        })
+        .render("#paypal-mark");
+
+      /* -----
+        IDEAL
+      ------ */
+      paypal
+        .Marks({
+          fundingSource: paypal.FUNDING.IDEAL,
+        })
+        .render("#ideal-mark");
+
+      paypal
+        .Fields({
+          fundingSource: paypal.FUNDING.IDEAL,
+          style: {},
+          amount: {},
+          onInit: (data, actions) => {
+            const form = document.querySelector("form.paypal-payment-form");
+
+            form.addEventListener("submit", (e) => {
+              const formData = new FormData(form);
+              const paymentSource = formData.get("payment-option");
+
+              if (paymentSource === paypal.FUNDING.IDEAL) {
+                e.preventDefault();
+
+                actions.validate().then((valid) => {
+                  if (valid) {
+                    window.location.href = `/second-page.html?payment-option=${paypal.FUNDING.IDEAL}`;
+                  }
+                });
+              }
+            });
+          },
+          fields: {
+            name: {},
+          },
+        })
+        .render("#ideal-container");
+
+      /* -----
+      SOFORT
+      ------ */
+      paypal
+        .Marks({
+          fundingSource: paypal.FUNDING.SOFORT,
+        })
+        .render("#sofort-mark");
+
+      paypal
+        .Fields({
+          fundingSource: paypal.FUNDING.SOFORT,
+          style: {},
+          onInit: (data, actions) => {
+            const form = document.querySelector("form.paypal-payment-form");
+
+            form.addEventListener("submit", (e) => {
+              const formData = new FormData(form);
+              const paymentSource = formData.get("payment-option");
+
+              if (paymentSource === paypal.FUNDING.SOFORT) {
+                e.preventDefault();
+                actions.validate().then((valid) => {
+                  if (valid) {
+                    window.location.href = `/second-page.html?payment-option=${paypal.FUNDING.SOFORT}`;
+                  }
+                });
+              }
+            });
+          },
+        })
+        .render("#sofort-container");
+
+      /* Listen for changes to the radio buttons */
+      document.querySelectorAll("input[name=payment-option]").forEach((el) => {
+        el.addEventListener("change", (event) => {
+          switch (event.target.value) {
+            case "paypal":
+              document.body.querySelector("#ideal-container").style.display =
+                "none";
+
+              document.body.querySelector("#sofort-container").style.display =
+                "none";
+
+              break;
+            case "ideal":
+              document.body.querySelector("#ideal-container").style.display =
+                "block";
+
+              document.body.querySelector("#sofort-container").style.display =
+                "none";
+              break;
+
+            case "sofort":
+              document.body.querySelector("#ideal-container").style.display =
+                "none";
+
+              document.body.querySelector("#sofort-container").style.display =
+                "block";
+              break;
+            default:
+              break;
+          }
+        });
+      });
+
+      document.body.querySelector("#ideal-container").style.display = "none";
+      document.body.querySelector("#sofort-container").style.display = "none";
+    </script>
+  </body>
+</html>

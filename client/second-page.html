@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Second Page</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1"
+      crossorigin="anonymous"
+    />
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="row justify-content-md-center">
+        <div class="col col-lg-5">
+          <div class="alert alert-light" role="alert">Second page</div>
+
+          <br /><br /><br />
+
+          <div id="paypal-btn"></div>
+          <div id="ideal-btn"></div>
+          <div id="sofort-btn"></div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://www.paypal.com/sdk/js?client-id=AfPbdUbV4LJdK0-0B0QPeUyHnzGgVhIwZfBO3wYRoazaSYRJAIKwwHnfI0EbekJB42FJuVi-3-vgsQvi&components=buttons,fields,marks,funding-eligibility&enable-funding=ideal,sofort,giropay,p24,trustly,bancontact,mybank,eps&currency=EUR"></script>
+    <script
+      src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"
+      async
+    ></script>
+
+    <script>
+      const order = {
+        purchase_units: [
+          {
+            amount: {
+              currency_code: "EUR",
+              value: "49.11",
+            },
+          },
+        ],
+        application_context: {
+          return_url: `${window.location.origin}/success.html`,
+          cancel_url: `${window.location.origin}/cancel.html`,
+        },
+      };
+
+      /* -----
+        PAYPAL
+      ------ */
+      paypal
+        .Buttons({
+          fundingSource: paypal.FUNDING.PAYPAL,
+
+          style: {
+            label: "pay",
+          },
+
+          createOrder(data, actions) {
+            return actions.order.create(order);
+          },
+
+          onApprove(data, actions) {
+            fetch(`/capture/${data.orderID}`, {
+              method: "post",
+            })
+              .then((res) => res.json())
+              .then((data) => {
+                console.log(data);
+                swal(
+                  "Order Captured!",
+                  `Id: ${data.id}, ${Object.keys(data.payment_source)[0]}, ${
+                    data.purchase_units[0].payments.captures[0].amount
+                      .currency_code
+                  } ${
+                    data.purchase_units[0].payments.captures[0].amount.value
+                  }`,
+                  "success"
+                );
+              })
+              .catch(console.error);
+          },
+
+          onCancel(data, actions) {
+            console.log(data);
+            swal("Order Canceled", `ID: ${data.orderID}`, "warning");
+          },
+
+          onError(err) {
+            console.error(err);
+            swal("Error", `${err.message}`, "warning");
+          },
+        })
+        .render("#paypal-btn");
+
+      /* -----
+        IDEAL
+        ------ */
+      paypal
+        .Buttons({
+          fundingSource: paypal.FUNDING.IDEAL,
+          upgradeLSAT: true,
+          style: {
+            label: "pay",
+          },
+
+          createOrder(data, actions) {
+            return actions.order.create(order);
+          },
+
+          onApprove(data, actions) {
+            fetch(`/capture/${data.orderID}`, {
+              method: "post",
+            })
+              .then((res) => res.json())
+              .then((data) => {
+                console.log(data);
+                swal(
+                  "Order Captured!",
+                  `Id: ${data.id}, ${Object.keys(data.payment_source)[0]}, ${
+                    data.purchase_units[0].payments.captures[0].amount
+                      .currency_code
+                  } ${
+                    data.purchase_units[0].payments.captures[0].amount.value
+                  }`,
+                  "success"
+                );
+              })
+              .catch(console.error);
+          },
+
+          onCancel(data, actions) {
+            console.log(data);
+            swal("Order Canceled", `ID: ${data.orderID}`, "warning");
+          },
+
+          onError(err) {
+            console.error(err);
+            swal("Error", `${err.message}`, "warning");
+          },
+        })
+        .render("#ideal-btn");
+
+      /* -----
+      SOFORT
+      ------ */
+      paypal
+        .Buttons({
+          fundingSource: paypal.FUNDING.SOFORT,
+          upgradeLSAT: true,
+          style: {
+            label: "pay",
+          },
+
+          createOrder(data, actions) {
+            return actions.order.create(order);
+          },
+
+          onApprove(data, actions) {
+            fetch(`/capture/${data.orderID}`, {
+              method: "post",
+            })
+              .then((res) => res.json())
+              .then((data) => {
+                console.log(data);
+                swal(
+                  "Order Captured!",
+                  `Id: ${data.id}, ${Object.keys(data.payment_source)[0]}, ${
+                    data.purchase_units[0].payments.captures[0].amount
+                      .currency_code
+                  } ${
+                    data.purchase_units[0].payments.captures[0].amount.value
+                  }`,
+                  "success"
+                );
+              })
+              .catch(console.error);
+          },
+
+          onCancel(data, actions) {
+            console.log(data);
+            swal("Order Canceled", `ID: ${data.orderID}`, "warning");
+          },
+
+          onError(err) {
+            console.error(err);
+            swal("Error", `${err.message}`, "warning");
+          },
+        })
+        .render("#sofort-btn");
+
+      // Display corresponding button
+      const urlParams = new URLSearchParams(window.location.search);
+      const paymentSource = urlParams.get("payment-option");
+
+      switch (paymentSource) {
+        case paypal.FUNDING.PAYPAL:
+          document.getElementById("ideal-btn").style.display = "none";
+          document.body.querySelector("#paypal-btn").style.display = "block";
+          document.getElementById("sofort-btn").style.display = "none";
+
+          break;
+        case paypal.FUNDING.IDEAL:
+          document.getElementById("ideal-btn").style.display = "block";
+          document.body.querySelector("#paypal-btn").style.display = "none";
+          document.getElementById("sofort-btn").style.display = "none";
+          break;
+
+        case paypal.FUNDING.SOFORT:
+          document.getElementById("ideal-btn").style.display = "none";
+          document.body.querySelector("#paypal-btn").style.display = "none";
+          document.getElementById("sofort-btn").style.display = "block";
+          break;
+        default:
+          break;
+      }
+    </script>
+  </body>
+</html>
