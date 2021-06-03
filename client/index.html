@@ -169,6 +169,7 @@
 
               if (paymentSource === paypal.FUNDING.SOFORT) {
                 e.preventDefault();
+                
                 actions.validate().then((valid) => {
                   if (valid) {
                     window.location.href = `/second-page.html?payment-option=${paypal.FUNDING.SOFORT}`;
@@ -184,29 +185,28 @@
       document.querySelectorAll("input[name=payment-option]").forEach((el) => {
         el.addEventListener("change", (event) => {
           switch (event.target.value) {
-            case "paypal":
+            case paypal.FUNDING.PAYPAL:
               document.body.querySelector("#ideal-container").style.display =
                 "none";
 
               document.body.querySelector("#sofort-container").style.display =
                 "none";
-
               break;
-            case "ideal":
+              
+            case paypal.FUNDING.IDEAL:
               document.body.querySelector("#ideal-container").style.display =
                 "block";
-
               document.body.querySelector("#sofort-container").style.display =
                 "none";
               break;
 
-            case "sofort":
+            case paypal.FUNDING.SOFORT:
               document.body.querySelector("#ideal-container").style.display =
                 "none";
-
               document.body.querySelector("#sofort-container").style.display =
                 "block";
               break;
+              
             default:
               break;
           }
