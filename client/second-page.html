@@ -27,7 +27,7 @@
       </div>
     </div>
 
-    <script src="https://www.paypal.com/sdk/js?client-id=AfPbdUbV4LJdK0-0B0QPeUyHnzGgVhIwZfBO3wYRoazaSYRJAIKwwHnfI0EbekJB42FJuVi-3-vgsQvi&components=buttons,fields,marks,funding-eligibility&enable-funding=ideal,sofort,giropay,p24,trustly,bancontact,mybank,eps&currency=EUR"></script>
+    <script src="https://www.paypal.com/sdk/js?client-id=AfPbdUbV4LJdK0-0B0QPeUyHnzGgVhIwZfBO3wYRoazaSYRJAIKwwHnfI0EbekJB42FJuVi-3-vgsQvi&components=buttons,payment-fields,marks,funding-eligibility&enable-funding=ideal,sofort,giropay,p24,trustly,bancontact,mybank,eps&currency=EUR"></script>
     <script
       src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"
       async
@@ -151,7 +151,6 @@
       paypal
         .Buttons({
           fundingSource: paypal.FUNDING.SOFORT,
-          upgradeLSAT: true,
           style: {
             label: "pay",
           },
